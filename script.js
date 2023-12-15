@@ -5,10 +5,16 @@ The user clicks the delete button for one of the parties.
 That party is then removed from the list.
 There is also a form that allows the user to enter information about a new party that they want to schedule. 
 After filling out the form and submitting it, the user observes their party added to the list of parties. */
-
 //step 1: create a variable for the api url
 const API_URL =
   "https://fsa-crud-2aa9294fe819.herokuapp.com/api/2309-FTB-MT-WEB-PT/events";
+//get DOM queries
+const button = document.querySelector("#submit");
+//the outputs
+const outputs = document.querySelector("#outputs");
+const addPartyForm = document.querySelector("#addParty");
+addPartyForm.addEventListener("submit", inputValues);
+const update = document.querySelector("#update");
 
 //step 2: create a state
 const state = {
@@ -18,8 +24,9 @@ const state = {
 //step 3: create a render function
 async function render() {
   await getParties();
-  document.querySelector("#outputs").innerHTML = state.parties.join("");
+  renderParties();
 }
+render();
 
 //create a fetch method
 async function getParties() {
@@ -30,7 +37,7 @@ async function getParties() {
     const json = await response.json();
     console.log("scriptData =>", json.data);
     state.parties = json.data;
-    return json.data;
+    // renderParties();
   } catch (error) {
     console.error("there was an issue getting your data");
   }
@@ -52,17 +59,65 @@ async function createParties(name, date, time, location, description) {
   } catch (error) {
     console.error(error, "there was an issue posting your data");
   }
-
-  async function updateParties() {}
-  // // define the dom elements
-  // const generalInput = document.querySelector("input");
-  // const nameInput = document.querySelector('input[name="name"]');
-  // const dateInput = document.querySelector('input[name="date"]');
-  // const timeInput = document.querySelector('input[name="time"]');
-  // const locationInput = document.querySelector('input[name="location"]');
-  // const descriptionInput = document.querySelector('input[name="description"]');
-  // //obtain the user input values
-  // generalInput.forEach (inputs => {
-  //     return inputs.value;
-  // })
 }
+
+//create a function that deletes the parties.  REMEMBER NOT TO DELETE PRE-EXISTING PARTIES FROM THE API!!!
+function deleteParty(id) {
+  try {
+    const response = await(`${API_URL}/${id}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      throw new error("there was an error deleting the party");
+    }
+    //update the UI
+    render();
+  } catch (error) {
+    console.error("There was an error /DELETE parties");
+  }
+}
+
+//render the parties
+function renderParties() {
+  // if they don't exist, display not found
+  if (state.parties.length === 0) {
+    update.innerHTML = `<li> No parties were found </li>`;
+    return;
+  }
+  const partiesScheduled = state.parties.map((party) => {
+    // create an li
+    const scheduledParty = document.createElement("li");
+    //add a class to that
+    scheduledParty.classList.add("party");
+    scheduledParty.innerHTML = `
+    <h2>${party.name}</h2>
+    <div>${party.date}</div>
+    <div>${party.time}</div>
+    <div>${party.location}</div>
+    <div>${party.description}</div>
+    `;
+    //make a delete button
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete Party";
+    //append it
+    scheduledParty.appendChild(deleteButton);
+    deleteButton.addEventListener("click", () => deleteParty(party.id));
+    return scheduledParty;
+  });
+  outputs.replaceChildren(...partiesScheduled);
+}
+
+// organize the input values into a function
+//name, date, time, location, description
+async function inputValues(event) {
+  event.preventDefault();
+  addInput = document.querySelector("input");
+  await createParties(
+    addInput.name.value,
+    addInput.date.value,
+    addInput.time.value,
+    addInput.location.value,
+    addInput.description.value
+  );
+}
+console.log(state.parties);

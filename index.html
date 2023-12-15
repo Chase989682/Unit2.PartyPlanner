@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Party Planner</title>
     <link rel="stylesheet" href="styles.css" />
-    <script src="script.js"></script>
   </head>
   <body>
     <header>
@@ -14,7 +13,7 @@
     <main>
       <section>
         <h3>Schedule a Party</h3>
-        <form>
+        <form id="addParty">
           <!-- There is also a form that allows the user 
                     to enter information about a new party that they 
                     want to schedule. After filling out the form and 
@@ -24,7 +23,7 @@
           <p>Date</p>
           <input type="date" name="date" placeholder="date" />
           <p>Time</p>
-          <input type="time" name="time" placeholder="time" />
+          <input type="text" name="time" placeholder="time" />
           <p>Location</p>
           <input type="text" name="location" placeholder="location" />
           <p>Description</p>
@@ -34,9 +33,13 @@
             placeholder="Enter a description"
             class="description"
           />
+          <button id="submit">Submit</button>
         </form>
       </section>
-      <section id="outputs"></section>
+      <section id="outputs">
+        <ul id="update"></ul>
+      </section>
     </main>
+    <script src="script.js"></script>
   </body>
 </html>

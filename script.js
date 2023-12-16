@@ -37,7 +37,7 @@ async function getParties() {
     const json = await response.json();
     console.log("scriptData =>", json.data);
     state.parties = json.data;
-    // renderParties();
+    renderParties();
   } catch (error) {
     console.error("there was an issue getting your data");
   }
@@ -47,12 +47,19 @@ getParties();
 
 async function createParties(name, date, time, location, description) {
   try {
+    const dateFormatted = new Date(date);
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, date, time, location, description }),
+      body: JSON.stringify({
+        name,
+        description,
+        date: dateFormatted.toISOString(),
+        location,
+      }),
     });
     const json = response.json();
+    render();
     if (json.error) {
       throw new Error(json.message);
     }
@@ -62,9 +69,9 @@ async function createParties(name, date, time, location, description) {
 }
 
 //create a function that deletes the parties.  REMEMBER NOT TO DELETE PRE-EXISTING PARTIES FROM THE API!!!
-function deleteParty(id) {
+async function deleteParty(id) {
   try {
-    const response = await(`${API_URL}/${id}`, {
+    const response = await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
     });
     if (!response.ok) {
@@ -111,13 +118,15 @@ function renderParties() {
 //name, date, time, location, description
 async function inputValues(event) {
   event.preventDefault();
-  addInput = document.querySelector("input");
+  addInput = document.querySelectorAll("input");
+  console.log(addInput);
+  console.log(addInput[1].value);
   await createParties(
-    addInput.name.value,
-    addInput.date.value,
-    addInput.time.value,
-    addInput.location.value,
-    addInput.description.value
+    addInput[0].value,
+    addInput[1].value,
+    addInput[2].value,
+    addInput[3].value,
+    addInput[4].value
   );
 }
 console.log(state.parties);
